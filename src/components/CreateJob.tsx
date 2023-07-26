@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { FormikProps, useFormik } from "formik";
 import * as yup from "yup";
+import toast from "react-hot-toast";
 
 import Form from "./Form";
+import Alert from "./Alert";
 
 interface ICreateJobState {
   jobTitle: string;
@@ -10,33 +12,33 @@ interface ICreateJobState {
   industry: string;
   location: string;
   remoteType: string;
-  experience: {
-    min: number;
-    max: Number;
-  };
-  salary: {
-    min: number;
-    max: number;
-  };
-  totalEmployee: number;
-  applyType: null | "quick" | "external";
+  // experience: {
+  //   min: number;
+  //   max: Number;
+  // };
+  // salary: {
+  //   min: number;
+  //   max: number;
+  // };
+  // totalEmployee: number;
+  // applyType: null | "quick" | "external";
 }
 
 const CreateJobSchema = yup.object().shape({
-  jobTitle: yup.string().required(),
-  companyName: yup.string().required(),
-  industry: yup.string().required(),
+  jobTitle: yup.string().required("Job Title is required"),
+  companyName: yup.string().required("Company Name is required"),
+  industry: yup.string().required("Industry is required"),
   location: yup.string(),
   remoteType: yup.string(),
-  experience: yup.object({
-    min: yup.string().required(),
-    max: yup.string().required(),
-  }),
-  salary: yup.object({
-    min: yup.number().required(),
-    max: yup.number().required(),
-  }),
-  totalEmployee: yup.string().required(),
+  // experience: yup.object({
+  //   min: yup.string().required(),
+  //   max: yup.string().required(),
+  // }),
+  // salary: yup.object({
+  //   min: yup.number().required(),
+  //   max: yup.number().required(),
+  // }),
+  // totalEmployee: yup.string().required(),
 
   // applyType: null | "quick" | "external";
 });
@@ -52,21 +54,36 @@ export default function CreateJob() {
       industry: "",
       location: "",
       remoteType: "",
-      experience: {
-        min: 0,
-        max: 0,
-      },
-      salary: {
-        min: 0,
-        max: 0,
-      },
-      totalEmployee: 0,
-      applyType: null,
+      // experience: {
+      //   min: 0,
+      //   max: 0,
+      // },
+      // salary: {
+      //   min: 0,
+      //   max: 0,
+      // },
+      // totalEmployee: 0,
+      // applyType: null,
     },
     onSubmit: handleSubmit,
   });
 
-  function handleSubmit() {}
+  function handleSubmit() {
+    console.log(formik.errors);
+  }
+
+  function handleSubmitStep() {
+    if (Object.keys(formik.errors).length === 0) {
+      formik.handleSubmit();
+    } else {
+      //@ts-ignore
+      Object.keys(formik.errors).forEach((key: keyof ICreateJobState) => {
+        toast.custom((t) => (
+          <Alert msg={formik.errors[key] as string} toastId={t} />
+        ));
+      });
+    }
+  }
 
   return (
     <div className="job_form_container p-8">
@@ -107,7 +124,7 @@ export default function CreateJob() {
         <Form.Input
           title="Remote type"
           placeholder="ex. In-office"
-          value={formik.values.industry}
+          value={formik.values.remoteType}
           handleChange={formik.handleChange("remoteType")}
         />
       </div>
@@ -116,6 +133,7 @@ export default function CreateJob() {
         <button
           type="button"
           className="text-white focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2  focus:outline-none dark:focus:ring-blue-800 button"
+          onClick={handleSubmitStep}
         >
           Next
         </button>
