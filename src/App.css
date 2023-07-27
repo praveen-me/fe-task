@@ -33,11 +33,19 @@ body {
 
 .button {
   background-color: #1597e4;
-  margin-top: 72px;
+  border-color: #1597e4;
+
+  @apply border-2 text-white focus:ring-4 font-medium rounded-md text-sm px-5 py-2.5 mt-0;
 }
 
 .button:hover {
   background-color: #0784cc;
+}
+
+.outline_button {
+  @apply bg-white;
+  color: #1597e4;
+  border-color: #1597e4;
 }
 
 .alert {
@@ -76,14 +84,10 @@ body {
   color: #646464;
 }
 
-.job_card_apply_button {
-  background-color: #0784cc;
-}
-
 .modal_container {
   @apply top-0 left-0 right-0 z-50 bg-white  w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%)]  justify-center items-center;
   animation: fadein 0.5s;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 .modal_close_button {
@@ -97,4 +101,8 @@ body {
   to {
     opacity: 1;
   }
+}
+
+.loader {
+  @apply inline w-10 h-10 mr-3 text-blue-600 animate-spin;
 }

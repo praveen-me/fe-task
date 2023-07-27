@@ -1,6 +1,7 @@
 import React from "react";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Job } from "../@types";
+import AppButton from "./AppButton";
 
 interface IJobCardProps {
   job: Job;
@@ -49,22 +50,22 @@ export default function JobCard(props: IJobCardProps) {
           <div className="my-6">
             <p className="mb-2 font-normal">Part-Time (9:00am - 5:00pm IST)</p>
             <p className="mb-2 font-normal">
-              Experience (${job.experience_min} - ${job.experience_max} years)
+              Experience ({job.experience_min} - {job.experience_max} years)
             </p>
             <p className="mb-2 font-normal">
               INR (₹) ${job.salary_min} - ${job.salary_max} / Month{" "}
             </p>
-            <p className="mb-2 font-normal">${job.total_employee} employee</p>
+            <p className="mb-2 font-normal">{job.total_employee} employee</p>
           </div>
 
           <div>
-            <button
-              type="button"
-              className="text-white focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none dark:focus:ring-blue-800 job_card_apply_button mt-0 "
-              // onClick={handleSubmitStep}
-            >
-              Save
-            </button>
+            <AppButton
+              title={
+                job.apply_type === "quick" ? "Apply Now" : "External Apply"
+              }
+              handleSubmit={() => {}}
+              outline={!(job.apply_type === "quick")}
+            />
           </div>
         </div>
       </div>

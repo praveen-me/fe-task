@@ -1,79 +1,79 @@
 import React, { createContext, useReducer, useContext } from "react";
 import { Job } from "../@types";
 
+// Action Types
+const SET_ALL_JOBS = "SET_ALL_JOBS";
+const SET_IS_LOADING = "SET_IS_LOADING";
+
 // Define your state type
 interface AppState {
   jobs: Job[];
+  isLoading: boolean;
 }
 
 export interface ISetAllJobs {
-  type: typeof types.SET_ALL_JOBS;
+  type: typeof SET_ALL_JOBS;
   payload: { jobs: Job[] };
 }
 
+export interface ISetIsLoading {
+  type: typeof SET_IS_LOADING;
+}
+
 // Define your action types
-type AppAction = ISetAllJobs;
+type AppAction = ISetAllJobs | ISetIsLoading;
 
 // Define your initial state
 const initialState: AppState = {
   jobs: [],
+  isLoading: false,
 };
 
 // Actions
-
-const types = {
-  SET_ALL_JOBS: "SET_ALL_JOBS",
-  REMOVE_JOB: "REMOVE_JOB",
-  EDIT_JOB: "EDIT_JOB",
-};
-
-export function setAllJobs(jobs: AppState["jobs"]) {
+export function setAllJobs(jobs: AppState["jobs"]): ISetAllJobs {
   return {
-    type: types.SET_ALL_JOBS,
+    type: SET_ALL_JOBS,
     payload: {
       jobs,
     },
   };
 }
 
-export function removeJob(jobId: string) {
+export function setIsLoading(): ISetIsLoading {
   return {
-    type: types.SET_ALL_JOBS,
-    payload: {
-      jobId,
-    },
-  };
-}
-
-export function editJob(job: Job) {
-  return {
-    type: types.SET_ALL_JOBS,
-    payload: {
-      job,
-    },
+    type: SET_IS_LOADING,
   };
 }
 
 // Define your reducer function
-const reducer = (state: AppState, action: AppAction): AppState => {
+const reducer = (
+  state: AppState = initialState,
+  action: AppAction
+): AppState => {
   switch (action.type) {
-    case types.SET_ALL_JOBS: {
+    case SET_ALL_JOBS: {
       return {
         ...state,
         jobs: action.payload.jobs,
       };
     }
+
+    case SET_IS_LOADING: {
+      return {
+        ...state,
+        isLoading: state.isLoading,
+      };
+    }
+
     default:
       return state;
   }
 };
 
-// Create the context for the store
 const StoreContext = createContext<
   { state: AppState; dispatch: React.Dispatch<AppAction> } | undefined
 >(undefined);
 
-// Create the provider to wrap your app with
 const StoreProvider = ({ children }: { children: JSX.Element }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -84,7 +84,6 @@ const StoreProvider = ({ children }: { children: JSX.Element }) => {
   );
 };
 
-// Create a custom hook to easily access the store values and dispatch function
 const useStore = () => {
   const context = useContext(StoreContext);
   if (!context) {

@@ -9,6 +9,7 @@ import { createJob, updateJob } from "../api";
 import { Job } from "../@types";
 import { useStore } from "../store";
 import helpers from "../helpers";
+import AppButton from "./AppButton";
 
 interface ICreateJobState {
   step1: {
@@ -156,14 +157,8 @@ function CreateJobStep1(
         />
       </div>
 
-      <div className="flex flex-row justify-end">
-        <button
-          type="button"
-          className="text-white focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2  focus:outline-none dark:focus:ring-blue-800 button"
-          onClick={handleSubmitStep}
-        >
-          Next
-        </button>
+      <div className="flex flex-row justify-end mt-[calc(72px)] ">
+        <AppButton title="Next" handleSubmit={handleSubmitStep} />
       </div>
     </form>
   );
@@ -255,14 +250,8 @@ function CreateJobStep2(
         }}
       />
 
-      <div className="flex flex-row justify-end">
-        <button
-          type="button"
-          className="text-white focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2  focus:outline-none dark:focus:ring-blue-800 button"
-          onClick={handleSubmitStep}
-        >
-          Save
-        </button>
+      <div className="flex flex-row justify-end mt-[calc(72px)] ">
+        <AppButton title="Save" handleSubmit={handleSubmitStep} />
       </div>
     </div>
   );

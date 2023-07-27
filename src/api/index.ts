@@ -7,7 +7,7 @@ const instance = axios.create({
 
 export const getAllJobs = () => instance.get("/jobs");
 
-export const deleteJob = (jobId: string) => instance.get("/jobs/" + jobId);
+export const deleteJob = (jobId: string) => instance.delete("/jobs/" + jobId);
 
 export const createJob = (job: Job) => instance.post("/jobs", job);
 
