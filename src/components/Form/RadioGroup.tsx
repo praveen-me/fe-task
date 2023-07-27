@@ -1,5 +1,3 @@
-import React, { ChangeEvent } from "react";
-
 interface IRadioGroupProps {
   title: string;
   required?: boolean;
@@ -31,6 +29,7 @@ export default function RadioGroup(props: IRadioGroupProps) {
               name="inline-radio-group"
               className={`radio ${value === option.key ? "selected" : ""}`}
               onChange={() => handleChange(option.key as string)}
+              checked={value === option.key}
             />
             <label
               htmlFor="inline-radio"

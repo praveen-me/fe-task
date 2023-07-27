@@ -53,7 +53,7 @@ export default function JobCard(props: IJobCardProps) {
               Experience ({job.experience_min} - {job.experience_max} years)
             </p>
             <p className="mb-2 font-normal">
-              INR (₹) ${job.salary_min} - ${job.salary_max} / Month{" "}
+              INR (₹) {job.salary_min} - {job.salary_max} / Month
             </p>
             <p className="mb-2 font-normal">{job.total_employee} employee</p>
           </div>

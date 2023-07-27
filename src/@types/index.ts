@@ -1,22 +1,22 @@
 export interface ICreateJobState {
   step1: {
-    jobTitle: string;
-    companyName: string;
+    job_title: string;
+    company_name: string;
     industry: string;
     location: string;
-    remoteType: string;
+    remote_type: string;
   };
   step2: {
     experience: {
-      min: string;
-      max: string;
+      min: number;
+      max: number;
     };
     salary: {
-      min: string;
-      max: string;
+      min: number;
+      max: number;
     };
-    totalEmployee: string;
-    applyType: null | "quick" | "external";
+    total_employee: string;
+    apply_type: string | null;
   };
 }
 

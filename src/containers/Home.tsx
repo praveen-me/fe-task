@@ -47,6 +47,14 @@ export default function Home() {
     })();
   }, []);
 
+  useEffect(() => {
+    if (!showModal) {
+      setCurrentJobToEdit("");
+    }
+
+    return () => {};
+  }, [showModal]);
+
   async function handleOperationOnJob(
     jobId: string,
     operation: "delete" | "edit"
