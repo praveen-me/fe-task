@@ -28,6 +28,12 @@ interface ICreateJobState {
   };
 }
 
+interface ICreateJobStepProps {
+  handleSetJob: (
+    values: ICreateJobState["step1"] | ICreateJobState["step2"]
+  ) => void;
+}
+
 const CreateJobStep1Schema = yup.object().shape({
   jobTitle: yup.string().required("Job Title is required"),
   companyName: yup.string().required("Company Name is required"),
@@ -42,11 +48,15 @@ const CreateJobStep2Schema = yup.object().shape({
       min: yup.number(),
       max: yup.number(),
     })
-    .test(
-      "superior",
-      "minimum experience must be smaller than maximum experience",
-      (min, max) => min > max
-    ),
+    .test({
+      name: "superior",
+      test: (f) => {
+        if (!f.min || !f.max) return true;
+
+        return !(f.min > f.max);
+      },
+      message: "minimum experience must be smaller than maximum experience",
+    }),
   salary: yup
     .object({
       min: yup.number(),
@@ -55,13 +65,17 @@ const CreateJobStep2Schema = yup.object().shape({
     .test(
       "superior",
       `minimum salary must be smaller than maximum salary`,
-      (min, max) => min > max
+      (f) => {
+        if (!f.min || !f.max) return true;
+
+        return !(f.min > f.max);
+      }
     ),
   totalEmployee: yup.string(),
-  applyType: yup.string(),
+  applyType: yup.string().nullable(),
 });
 
-function CreateJobStep1() {
+function CreateJobStep1(props: ICreateJobStepProps) {
   const formik: FormikProps<ICreateJobState["step1"]> = useFormik<
     ICreateJobState["step1"]
   >({
@@ -77,7 +91,7 @@ function CreateJobStep1() {
   });
 
   function handleSubmit() {
-    console.log(formik.errors);
+    props.handleSetJob(formik.values);
   }
 
   function handleSubmitStep() {
@@ -96,7 +110,7 @@ function CreateJobStep1() {
   }
 
   return (
-    <div>
+    <form onSubmit={handleSubmitStep}>
       <Form.Input
         title="Job title"
         placeholder="ex. UX UI Designer"
@@ -143,11 +157,11 @@ function CreateJobStep1() {
           Next
         </button>
       </div>
-    </div>
+    </form>
   );
 }
 
-function CreateJobStep2() {
+function CreateJobStep2(props: ICreateJobStepProps) {
   const formik: FormikProps<ICreateJobState["step2"]> = useFormik<
     ICreateJobState["step2"]
   >({
@@ -168,7 +182,7 @@ function CreateJobStep2() {
   });
 
   function handleSubmit() {
-    console.log(formik.errors);
+    props.handleSetJob(formik.values);
   }
 
   function handleSubmitStep() {
@@ -184,8 +198,6 @@ function CreateJobStep2() {
       });
     }
   }
-
-  console.log(formik.errors);
 
   return (
     <div>
@@ -226,6 +238,12 @@ function CreateJobStep2() {
             value: "External apply",
           },
         ]}
+        value={formik.values.applyType}
+        //@ts-ignore
+        handleChange={(value: string) => {
+          console.log({ value });
+          formik.setFieldValue("applyType", value);
+        }}
       />
 
       <div className="flex flex-row justify-end">
@@ -242,7 +260,45 @@ function CreateJobStep2() {
 }
 
 export default function CreateJob() {
-  const [currentStep, setCurrentStep] = useState(2);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [job, setJob] = useState<
+    ICreateJobState["step1"] & ICreateJobState["step2"]
+  >({
+    jobTitle: "",
+    companyName: "",
+    industry: "",
+    location: "",
+    remoteType: "",
+    experience: {
+      min: "",
+      max: "",
+    },
+    salary: {
+      min: "",
+      max: "",
+    },
+    totalEmployee: "",
+    applyType: null,
+  });
+
+  function handleSetJob(
+    values: ICreateJobState["step1"] | ICreateJobState["step2"]
+  ) {
+    setJob({
+      ...job,
+      ...values,
+    });
+
+    if (currentStep === 1) {
+      setCurrentStep(2);
+    } else {
+      handleCreateJob();
+    }
+  }
+
+  function handleCreateJob() {
+    // setup API
+  }
 
   return (
     <div className="job_form_container p-8">
@@ -251,9 +307,11 @@ export default function CreateJob() {
         <h3 className="text-xl">Step {currentStep}</h3>
       </div>
 
-      {currentStep === 1 && <CreateJobStep1 />}
-
-      <CreateJobStep2 />
+      {currentStep === 1 ? (
+        <CreateJobStep1 handleSetJob={handleSetJob} />
+      ) : (
+        <CreateJobStep2 handleSetJob={handleSetJob} />
+      )}
     </div>
   );
 }
