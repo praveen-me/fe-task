@@ -6,10 +6,24 @@ interface IInputProps {
   placeholder: string;
   value: string | number;
   handleChange: (e: string | ChangeEvent<any>) => void;
+  multiInput?: boolean;
+  secondValue?: string | number;
+  secondHandleChange?: (e: string | ChangeEvent<any>) => void;
+  secondPlaceholder?: string;
 }
 
 export default function Input(props: IInputProps) {
-  const { title, required, placeholder, value, handleChange } = props;
+  const {
+    title,
+    required,
+    placeholder,
+    value,
+    handleChange,
+    multiInput,
+    secondValue,
+    secondHandleChange,
+    secondPlaceholder,
+  } = props;
 
   return (
     <div className="mb-6">
@@ -20,14 +34,27 @@ export default function Input(props: IInputProps) {
         {title}
         {required && <span className="required">*</span>}
       </label>
-      <input
-        className="appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none text_input"
-        id="job-title"
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        onChange={handleChange}
-      />
+      <div className={"flex flex-row justify-between"}>
+        <input
+          className="appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none text_input"
+          id="job-title"
+          type="text"
+          placeholder={placeholder}
+          value={value}
+          onChange={handleChange}
+        />
+
+        {multiInput && (
+          <input
+            className="appearance-none border w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none text_input ml-6"
+            id="job-title"
+            type="text"
+            placeholder={secondPlaceholder}
+            value={secondValue}
+            onChange={secondHandleChange}
+          />
+        )}
+      </div>
     </div>
   );
 }
