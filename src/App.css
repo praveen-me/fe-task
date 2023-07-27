@@ -8,6 +8,9 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 1000px;
+  margin: 0 auto;
 }
 
 .job_form_container {
@@ -50,16 +53,6 @@ body {
   @apply dark:focus:ring-blue-600 !important;
 }
 
-/* .radio_wrapper {
-  border: 2px solid red;
-  width: 20px;
-  height: 20px;
-  text-align: center;
-  margin-top: 2px;
-  background-color: #f0ffff;
-  border-radius: 50%;
-} */
-
 .radio::after {
   @apply border-2;
 
@@ -77,4 +70,31 @@ body {
 
 .radio_label {
   color: #7a7a7a;
+}
+
+.job_card_location {
+  color: #646464;
+}
+
+.job_card_apply_button {
+  background-color: #0784cc;
+}
+
+.modal_container {
+  @apply top-0 left-0 right-0 z-50 bg-white  w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%)]  justify-center items-center;
+  animation: fadein 0.5s;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.modal_close_button {
+  @apply absolute top-20 right-20 text-gray-400 bg-transparent bg-gray-200 text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:bg-gray-600  dark:text-white;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

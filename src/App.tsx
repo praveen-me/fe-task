@@ -1,14 +1,19 @@
 import React from "react";
 import { Toaster } from "react-hot-toast";
+import Home from "./containers/Home";
+import { StoreProvider } from "./store";
 
 import "./App.css";
-import CreateJob from "./components/CreateJob";
 
 function App() {
   return (
     <div className="App">
-      <CreateJob />
-      <Toaster position="top-right" reverseOrder={false} />
+      <StoreProvider>
+        <>
+          <Home />
+          <Toaster position="top-right" reverseOrder={false} />
+        </>
+      </StoreProvider>
     </div>
   );
 }

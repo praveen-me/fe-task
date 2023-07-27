@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 import Form from "./Form";
 import Alert from "./Alert";
+import { createJob } from "../api";
 
 interface ICreateJobState {
   step1: {
@@ -296,12 +297,26 @@ export default function CreateJob() {
     }
   }
 
-  function handleCreateJob() {
-    // setup API
+  async function handleCreateJob() {
+    const jobData = {
+      job_title: job.jobTitle,
+      company_name: job.companyName,
+      industry: job.industry,
+      location: job.location,
+      remote_type: job.remoteType,
+      experience_min: Number(job.experience.min),
+      experience_max: Number(job.experience.max),
+      salary_min: Number(job.salary.min),
+      salary_max: Number(job.salary.max),
+      total_employee: Number(job.totalEmployee),
+      apply_type: job.applyType as string,
+    };
+
+    await createJob(jobData);
   }
 
   return (
-    <div className="job_form_container p-8">
+    <div className="job_form_container p-8 bg-white">
       <div className="flex flex-row justify-between mb-6">
         <h2 className="text-xl">Create a job</h2>
         <h3 className="text-xl">Step {currentStep}</h3>
