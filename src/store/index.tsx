@@ -6,10 +6,13 @@ interface AppState {
   jobs: Job[];
 }
 
+export interface ISetAllJobs {
+  type: typeof types.SET_ALL_JOBS;
+  payload: { jobs: Job[] };
+}
+
 // Define your action types
-type AppAction =
-  | { type: typeof types.SET_ALL_JOBS; payload: { jobs: Job[] } }
-  | { type: "DECREMENT" };
+type AppAction = ISetAllJobs;
 
 // Define your initial state
 const initialState: AppState = {
@@ -54,6 +57,12 @@ export function editJob(job: Job) {
 // Define your reducer function
 const reducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
+    case types.SET_ALL_JOBS: {
+      return {
+        ...state,
+        jobs: action.payload.jobs,
+      };
+    }
     default:
       return state;
   }

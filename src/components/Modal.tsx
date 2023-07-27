@@ -1,10 +1,11 @@
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-import CreateJob from "./CreateJob";
+import { ReactElement } from "react";
 
 interface IModalProps {
   visible: boolean;
   toggleModal: (v?: boolean) => void;
+  children: ReactElement;
 }
 
 export default function Modal(props: IModalProps) {
@@ -27,9 +28,7 @@ export default function Modal(props: IModalProps) {
       </button>
 
       <div>
-        <div className="relative">
-          <CreateJob />
-        </div>
+        <div className="relative">{props.children}</div>
       </div>
     </div>
   );

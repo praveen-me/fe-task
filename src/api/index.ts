@@ -10,3 +10,6 @@ export const getAllJobs = () => instance.get("/jobs");
 export const deleteJob = (jobId: string) => instance.get("/jobs/" + jobId);
 
 export const createJob = (job: Job) => instance.post("/jobs", job);
+
+export const updateJob = (jobId: string, job: Job) =>
+  instance.put("/jobs/" + jobId, job);

@@ -31,6 +31,6 @@ export type Job = {
   experience_max: number;
   salary_min: number;
   salary_max: number;
-  total_employee: number;
+  total_employee: string;
   apply_type: string;
 };

@@ -5,27 +5,30 @@ import toast from "react-hot-toast";
 
 import Form from "./Form";
 import Alert from "./Alert";
-import { createJob } from "../api";
+import { createJob, updateJob } from "../api";
+import { Job } from "../@types";
+import { useStore } from "../store";
+import helpers from "../helpers";
 
 interface ICreateJobState {
   step1: {
-    jobTitle: string;
-    companyName: string;
+    job_title: string;
+    company_name: string;
     industry: string;
     location: string;
-    remoteType: string;
+    remote_type: string;
   };
   step2: {
     experience: {
-      min: string;
-      max: string;
+      min: number;
+      max: number;
     };
     salary: {
-      min: string;
-      max: string;
+      min: number;
+      max: number;
     };
-    totalEmployee: string;
-    applyType: null | "quick" | "external";
+    total_employee: string;
+    apply_type: string | null;
   };
 }
 
@@ -36,11 +39,11 @@ interface ICreateJobStepProps {
 }
 
 const CreateJobStep1Schema = yup.object().shape({
-  jobTitle: yup.string().required("Job Title is required"),
-  companyName: yup.string().required("Company Name is required"),
+  job_title: yup.string().required("Job Title is required"),
+  company_name: yup.string().required("Company Name is required"),
   industry: yup.string().required("Industry is required"),
   location: yup.string(),
-  remoteType: yup.string(),
+  remote_type: yup.string(),
 });
 
 const CreateJobStep2Schema = yup.object().shape({
@@ -72,21 +75,25 @@ const CreateJobStep2Schema = yup.object().shape({
         return !(f.min > f.max);
       }
     ),
-  totalEmployee: yup.string(),
-  applyType: yup.string().nullable(),
+  total_employee: yup.string(),
+  apply_type: yup.string().nullable(),
 });
 
-function CreateJobStep1(props: ICreateJobStepProps) {
+function CreateJobStep1(
+  props: ICreateJobStepProps & { oldValues: ICreateJobState["step1"] | null }
+) {
+  console.log(props.oldValues);
+
   const formik: FormikProps<ICreateJobState["step1"]> = useFormik<
     ICreateJobState["step1"]
   >({
     validationSchema: CreateJobStep1Schema,
-    initialValues: {
-      jobTitle: "",
-      companyName: "",
+    initialValues: props.oldValues || {
+      job_title: "",
+      company_name: "",
       industry: "",
       location: "",
-      remoteType: "",
+      remote_type: "",
     },
     onSubmit: handleSubmit,
   });
@@ -116,15 +123,15 @@ function CreateJobStep1(props: ICreateJobStepProps) {
         title="Job title"
         placeholder="ex. UX UI Designer"
         required
-        value={formik.values.jobTitle}
-        handleChange={formik.handleChange("jobTitle")}
+        value={formik.values.job_title}
+        handleChange={formik.handleChange("job_title")}
       />
       <Form.Input
         title="Company name"
         placeholder="ex. Google"
         required
-        value={formik.values.companyName}
-        handleChange={formik.handleChange("companyName")}
+        value={formik.values.company_name}
+        handleChange={formik.handleChange("company_name")}
       />
       <Form.Input
         title="Industry"
@@ -144,8 +151,8 @@ function CreateJobStep1(props: ICreateJobStepProps) {
         <Form.Input
           title="Remote type"
           placeholder="ex. In-office"
-          value={formik.values.remoteType}
-          handleChange={formik.handleChange("remoteType")}
+          value={formik.values.remote_type}
+          handleChange={formik.handleChange("remote_type")}
         />
       </div>
 
@@ -162,22 +169,24 @@ function CreateJobStep1(props: ICreateJobStepProps) {
   );
 }
 
-function CreateJobStep2(props: ICreateJobStepProps) {
+function CreateJobStep2(
+  props: ICreateJobStepProps & { oldValues: ICreateJobState["step2"] | null }
+) {
   const formik: FormikProps<ICreateJobState["step2"]> = useFormik<
     ICreateJobState["step2"]
   >({
     validationSchema: CreateJobStep2Schema,
-    initialValues: {
+    initialValues: props.oldValues || {
       experience: {
-        min: "",
-        max: "",
+        min: 0,
+        max: 0,
       },
       salary: {
-        min: "",
-        max: "",
+        min: 0,
+        max: 0,
       },
-      totalEmployee: "",
-      applyType: null,
+      total_employee: "",
+      apply_type: null,
     },
     onSubmit: handleSubmit,
   });
@@ -224,8 +233,8 @@ function CreateJobStep2(props: ICreateJobStepProps) {
       <Form.Input
         title="Total employee"
         placeholder="ex. 100"
-        value={formik.values.totalEmployee}
-        handleChange={formik.handleChange("totalEmployee")}
+        value={formik.values.total_employee}
+        handleChange={formik.handleChange("total_employee")}
       />
       <Form.RadioGroup
         title="Apply type"
@@ -239,11 +248,10 @@ function CreateJobStep2(props: ICreateJobStepProps) {
             value: "External apply",
           },
         ]}
-        value={formik.values.applyType}
+        value={formik.values.apply_type}
         //@ts-ignore
         handleChange={(value: string) => {
-          console.log({ value });
-          formik.setFieldValue("applyType", value);
+          formik.setFieldValue("apply_type", value);
         }}
       />
 
@@ -260,60 +268,96 @@ function CreateJobStep2(props: ICreateJobStepProps) {
   );
 }
 
-export default function CreateJob() {
+interface ICreateJobProps {
+  currentJobToEdit: Job;
+  toggleModal: () => void;
+}
+
+export default function CreateJob(props: ICreateJobProps) {
+  const { currentJobToEdit } = props;
+
+  const { dispatch } = useStore();
+
   const [currentStep, setCurrentStep] = useState(1);
-  const [job, setJob] = useState<
-    ICreateJobState["step1"] & ICreateJobState["step2"]
-  >({
-    jobTitle: "",
-    companyName: "",
-    industry: "",
-    location: "",
-    remoteType: "",
-    experience: {
-      min: "",
-      max: "",
-    },
-    salary: {
-      min: "",
-      max: "",
-    },
-    totalEmployee: "",
-    applyType: null,
-  });
+  const [job, setJob] = useState<Job>(
+    currentJobToEdit || {
+      job_title: "",
+      company_name: "",
+      industry: "",
+      location: "",
+      remote_type: "",
+      experience_min: 0,
+      experience_max: 0,
+      salary_min: 0,
+      salary_max: 0,
+      total_employee: "",
+      apply_type: null,
+    }
+  );
 
   function handleSetJob(
     values: ICreateJobState["step1"] | ICreateJobState["step2"]
   ) {
-    setJob({
-      ...job,
-      ...values,
-    });
+    if ("experience" in values) {
+      const updatedJob = {
+        ...job,
+        apply_type: values.apply_type,
+        total_employee: values.total_employee,
+        experience_min: values.experience.min,
+        experience_max: values?.experience.max,
+        salary_min: values?.salary.min,
+        salary_max: values?.salary.max,
+      } as Job;
 
-    if (currentStep === 1) {
-      setCurrentStep(2);
+      setJob(updatedJob);
+      handleCreateJob(updatedJob);
     } else {
-      handleCreateJob();
+      const updatedJob: Job = {
+        ...job,
+        ...values,
+      };
+
+      setJob(updatedJob);
+      setCurrentStep(2);
     }
   }
 
-  async function handleCreateJob() {
-    const jobData = {
-      job_title: job.jobTitle,
-      company_name: job.companyName,
-      industry: job.industry,
-      location: job.location,
-      remote_type: job.remoteType,
-      experience_min: Number(job.experience.min),
-      experience_max: Number(job.experience.max),
-      salary_min: Number(job.salary.min),
-      salary_max: Number(job.salary.max),
-      total_employee: Number(job.totalEmployee),
-      apply_type: job.applyType as string,
-    };
+  async function handleCreateJob(job: Job) {
+    if (job.id) {
+      await updateJob(job.id, job);
+    } else {
+      await createJob(job);
+    }
 
-    await createJob(jobData);
+    helpers.getAllJobs(dispatch);
+
+    props.toggleModal();
   }
+
+  const step1 = currentJobToEdit
+    ? {
+        job_title: currentJobToEdit.job_title,
+        company_name: currentJobToEdit.company_name,
+        industry: currentJobToEdit.industry,
+        location: currentJobToEdit.location,
+        remote_type: currentJobToEdit.remote_type,
+      }
+    : null;
+
+  const step2 = currentJobToEdit
+    ? {
+        total_employee: currentJobToEdit.total_employee,
+        apply_type: currentJobToEdit.apply_type,
+        experience: {
+          min: currentJobToEdit.experience_min,
+          max: currentJobToEdit.experience_max,
+        },
+        salary: {
+          min: currentJobToEdit.salary_min,
+          max: currentJobToEdit.salary_max,
+        },
+      }
+    : null;
 
   return (
     <div className="job_form_container p-8 bg-white">
@@ -323,9 +367,9 @@ export default function CreateJob() {
       </div>
 
       {currentStep === 1 ? (
-        <CreateJobStep1 handleSetJob={handleSetJob} />
+        <CreateJobStep1 handleSetJob={handleSetJob} oldValues={step1} />
       ) : (
-        <CreateJobStep2 handleSetJob={handleSetJob} />
+        <CreateJobStep2 handleSetJob={handleSetJob} oldValues={step2} />
       )}
     </div>
   );
